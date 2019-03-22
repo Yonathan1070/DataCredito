@@ -22,6 +22,7 @@ import java.util.Set;
 public class Principal implements Serializable{
     
     public BufferedReader entradaDatos=new BufferedReader(new InputStreamReader (System.in));
+    
     private HashMap<Integer,Persona> personas;
     
     public Principal() {
@@ -89,19 +90,37 @@ public class Principal implements Serializable{
             System.out.println("El cliente ya está registrado en el Sistema.");
         }else{
             personas.put(id, cliente);
+            System.out.println("Cliente registrado en el Sistema.");
         }
     }
     public void eliminarReporte(int idCliente){
+        int cantidad=0;
         try{
             if(personas.containsKey(idCliente)){
                 if(personas.get(idCliente).reporte.isEmpty()){
                     System.out.println("El cliente no tiene reportes en el Sistema");
                 }else{
                     for (Reporte rep : personas.get(idCliente).getReporte().values()) {
+                        
                         if(rep.getEstado().equals("-")){
-                            personas.get(idCliente).getReporte().remove(rep.getCodigo());
-                            System.out.println("Reportes con codigo "+rep.getCodigo()+" Eliminado.");
+                            cantidad =cantidad+1;
+                            System.out.println("Reporte Negativo con codigo "+rep.getCodigo()+".");
+                        }
+                    }
+                    if(cantidad==0){
+                        System.out.println("No hay mas Reportes negativos para el usuario "+
+                                personas.get(idCliente).getNombre()+" "+personas.get(idCliente).getApellido());
+                    }else{
+                        System.out.println("Digite el codigo del reporte que desea eliminar:");
+                        int codigo=Integer.parseInt(entradaDatos.readLine());
+                        if(personas.get(idCliente).getReporte().containsKey(codigo)
+                                && personas.get(idCliente).getReporte().get(codigo).getEstado().equals("-")){
+                            cantidad =cantidad-1;
+                            personas.get(idCliente).getReporte().remove(codigo);
                             eliminarReporte(idCliente);
+                            
+                        }else{
+                            System.out.println("El reporte no existe o es positivo.");
                         }
                     }
                 }
@@ -130,6 +149,18 @@ public class Principal implements Serializable{
                 personas.get(id).getReporte().put(codigo, rep);
             }else{
                 System.out.println("El cliente no está registrado en el Sistema.");
+                System.out.println("Desea registrar un cliente con el id "+id+"? (s/n)");
+                String eleccion=entradaDatos.readLine();
+                if(eleccion.equals("s") || eleccion.equals("S")){
+                    System.out.println("Nombre");
+                    String nombre=entradaDatos.readLine();
+                    System.out.println("Apellido");
+                    String apellido=entradaDatos.readLine();
+                    agregarPersona(id, apellido, nombre);
+                }else if(eleccion.equals("n") || eleccion.equals("N")){
+                }else{
+                    System.out.println("Opcion no válida, volviendo al menú principal");
+                }
             }
         }catch(Exception e){
             System.out.println(e.getMessage());
